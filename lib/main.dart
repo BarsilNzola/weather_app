@@ -43,7 +43,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   Future<void> _fetchWeather(String city) async {
     final response = await http.get(
-      Uri.parse('https://your-api-url/weather?city=$city'),
+      Uri.parse('https://https://weatheria-wlco.onrender.com/weather?city=$city'),
     );
 
     if (response.statusCode == 200) {
@@ -74,7 +74,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
     Position position = await _determinePosition();
     final response = await http.get(
       Uri.parse(
-          'https://your-api-url/weather?lat=${position.latitude}&lon=${position.longitude}'),
+          'https://https://weatheria-wlco.onrender.com/weather?lat=${position.latitude}&lon=${position.longitude}'),
     );
 
     if (response.statusCode == 200) {
