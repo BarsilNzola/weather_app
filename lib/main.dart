@@ -42,58 +42,63 @@ class _WeatherScreenState extends State<WeatherScreen> {
   bool _isDarkMode = false;
 
   Future<void> _fetchWeather(String city) async {
+  try {
     final response = await http.get(
-      Uri.parse('https://https://weatheria-wlco.onrender.com/weather?city=$city'),
+      Uri.parse('https://weatheria-wlco.onrender.com/?city=$city&format=json'),
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        _weather = data['weather'];
-        _temp = "${data['temperature']}°C";
-        _icon = data['icon'];
-        _humidity = "Humidity: ${data['humidity']}%";
-        _windSpeed = "Wind: ${data['wind_speed']} km/h";
-        _forecast = data['forecast'];
+        _weather = data['weather']['weather'][0]['description'];
+        _temp = "${data['weather']['main']['temp']}°C";
+        _icon = data['weather']['weather'][0]['icon'];
+        _humidity = "Humidity: ${data['weather']['main']['humidity']}%";
+        _windSpeed = "Wind: ${data['weather']['wind']['speed']} km/h";
+        _forecast = [];  // Add forecast data if available
         _errorMessage = '';
       });
     } else {
       setState(() {
-        _weather = '';
-        _temp = '';
-        _icon = '';
-        _humidity = '';
-        _windSpeed = '';
-        _forecast = [];
-        _errorMessage = 'Failed to load weather data';
+        _errorMessage = 'Failed to load weather data: ${response.statusCode}';
       });
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Error: $e';
+    });
   }
+}
 
-  Future<void> _fetchLocationWeather() async {
+Future<void> _fetchLocationWeather() async {
+  try {
     Position position = await _determinePosition();
     final response = await http.get(
-      Uri.parse(
-          'https://https://weatheria-wlco.onrender.com/weather?lat=${position.latitude}&lon=${position.longitude}'),
+      Uri.parse('https://weatheria-wlco.onrender.com/?lat=${position.latitude}&lon=${position.longitude}&format=json'),
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        _weather = data['weather'];
-        _temp = "${data['temperature']}°C";
-        _icon = data['icon'];
-        _humidity = "Humidity: ${data['humidity']}%";
-        _windSpeed = "Wind: ${data['wind_speed']} km/h";
-        _forecast = data['forecast'];
+        _weather = data['weather']['weather'][0]['description'];  // Updated path
+        _temp = "${data['weather']['main']['temp']}°C";          // Updated path
+        _icon = data['weather']['weather'][0]['icon'];           // Updated path
+        _humidity = "Humidity: ${data['weather']['main']['humidity']}%";  // Updated path
+        _windSpeed = "Wind: ${data['weather']['wind']['speed']} km/h";    // Updated path
+        _forecast = [];  // Add forecast data if available
         _errorMessage = '';
       });
     } else {
       setState(() {
-        _errorMessage = 'Failed to fetch location weather';
+        _errorMessage = 'Failed to fetch location weather: ${response.statusCode}';
       });
     }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Error: $e';
+    });
   }
+}
 
   Future<Position> _determinePosition() async {
   bool serviceEnabled;
